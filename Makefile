@@ -1,4 +1,51 @@
-include makefile.conf
+# Selecting Core
+CORTEX_M=3
+
+# Use newlib-nano. To disable it, specify USE_NANO=
+USE_NANO=--specs=nano.specs
+
+# Use seimhosting or not
+USE_SEMIHOST=--specs=rdimon.specs
+USE_NOHOST=--specs=nosys.specs
+
+CORE=CM$(CORTEX_M)
+
+
+# Compiler & Linker
+CC=arm-none-eabi-gcc
+CXX=arm-none-eabi-g++
+
+# Options for specific architecture
+ARCH_FLAGS=-mthumb -mcpu=cortex-m$(CORTEX_M)
+
+# Startup code
+STARTUP=startup_ARM$(CORE).S
+
+#OPENCM3_PATH       = ../libopencm3
+OPENCM3_PATH    = /usr/local/arm-none-eabi
+
+# include/ sub-directory
+OPENCM3_INC_PATH   = $(OPENCM3_PATH)/include
+# lib/ sub-directory
+OPENCM3_LIB_PATH   = $(OPENCM3_PATH)/lib
+
+#Processor family for libopencm3
+CM3_FAM=STM32F1
+
+# -Os -flto -ffunction-sections -fdata-sections to compile for code size
+CFLAGS=$(ARCH_FLAGS) $(STARTUP_DEFS) -Os -flto -ffunction-sections -fdata-sections \
+-I$(OPENCM3_INC_PATH)\
+-L$(OPENCM3_LIB_PATH)\
+-lopencm3_stm32f1\
+-D$(CM3_FAM)
+
+CXXFLAGS=$(CFLAGS)
+
+# Link for code size
+GC=-Wl,--gc-sections
+
+# Create map file
+MAP=-Wl,-Map=$(NAME).map
 NAME=minimum
 STARTUP_DEFS=-D__STARTUP_CLEAR_BSS -D__START=main
 
